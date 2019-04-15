@@ -1,5 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db.models import Q
+import itertools
 
 from .index import PartialIndex
 from . import query
@@ -54,7 +55,10 @@ class ValidatePartialUniqueMixin(object):
         Note that step 2 ensures the lookup only looks for conflicts among rows covered by the PartialIndes,
         and steps 2+3 ensures that the QuerySet is empty if the PartialIndex does not cover the current object.
         """
-        # Find PartialIndexes with unique=True defined on model.
+        # Find PartialIndexes with unique=True defined on model including indexes defined on ancestor models.
+        unique_idxs = []
+        for model in (self, *self._meta.get_parent_list()):
+            unique_idxs.extend(idx for idx in model._meta.indexes if isinstance(idx, PartialIndex) and idx.unique)
         unique_idxs = [idx for idx in self._meta.indexes if isinstance(idx, PartialIndex) and idx.unique]
 
         if unique_idxs:

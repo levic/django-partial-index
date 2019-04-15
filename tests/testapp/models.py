@@ -53,6 +53,11 @@ class RoomBookingQ(ValidatePartialUniqueMixin, models.Model):
         indexes = [PartialIndex(fields=['user', 'room'], unique=True, where=PQ(deleted_at__isnull=True))]
 
 
+class RoomBookingQChild(RoomBookingQ):
+    class Meta:
+        pass
+
+
 class JobText(models.Model):
     order = models.IntegerField()
     group = models.IntegerField()

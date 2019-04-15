@@ -1,7 +1,7 @@
 """ModelForms for testing ValidatePartialUniqueMixin."""
 from django import forms
 
-from testapp.models import RoomBookingQ, RoomBookingText
+from testapp.models import RoomBookingQ, RoomBookingQChild, RoomBookingText
 
 
 class RoomBookingTextForm(forms.ModelForm):
@@ -15,6 +15,13 @@ class RoomBookingAllFieldsForm(forms.ModelForm):
     """All fields are present on the form."""
     class Meta:
         model = RoomBookingQ
+        fields = ('user', 'room', 'deleted_at')
+
+
+class RoomBookingChildAllFieldsForm(forms.ModelForm):
+    """All fields are present on the form, model uses multi-table inheritance."""
+    class Meta:
+        model = RoomBookingQChild
         fields = ('user', 'room', 'deleted_at')
 
 

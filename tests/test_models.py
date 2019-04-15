@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 
-from testapp.models import User, Room, RoomBookingText, JobText, ComparisonText, RoomBookingQ, JobQ, ComparisonQ
+from testapp.models import User, Room, RoomBookingText, JobText, ComparisonText, RoomBookingQ, RoomBookingQChild, JobQ, ComparisonQ
 
 
 class PartialIndexRoomBookingTest(TestCase):
@@ -28,6 +28,10 @@ class PartialIndexRoomBookingTest(TestCase):
         RoomBookingQ.objects.create(user=self.user1, room=self.room1)
         RoomBookingQ.objects.create(user=self.user1, room=self.room2)
 
+    def test_roombooking_q_child_different_rooms(self):
+        RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
+        RoomBookingQChild.objects.create(user=self.user1, room=self.room2)
+
     def test_roombooking_text_different_users(self):
         RoomBookingText.objects.create(user=self.user1, room=self.room1)
         RoomBookingText.objects.create(user=self.user2, room=self.room1)
@@ -35,6 +39,10 @@ class PartialIndexRoomBookingTest(TestCase):
     def test_roombooking_q_different_users(self):
         RoomBookingQ.objects.create(user=self.user1, room=self.room1)
         RoomBookingQ.objects.create(user=self.user2, room=self.room1)
+
+    def test_roombooking_q_child_different_users(self):
+        RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
+        RoomBookingQChild.objects.create(user=self.user2, room=self.room1)
 
     def test_roombooking_text_same_mark_first_deleted(self):
         for i in range(3):
@@ -50,6 +58,13 @@ class PartialIndexRoomBookingTest(TestCase):
             book.save()
         RoomBookingQ.objects.create(user=self.user1, room=self.room1)
 
+    def test_roombooking_q_child_same_mark_first_deleted(self):
+        for i in range(3):
+            book = RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
+            book.deleted_at = timezone.now()
+            book.save()
+        RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
+
     def test_roombooking_text_same_conflict(self):
         RoomBookingText.objects.create(user=self.user1, room=self.room1)
         with self.assertRaises(IntegrityError):
@@ -59,6 +74,11 @@ class PartialIndexRoomBookingTest(TestCase):
         RoomBookingQ.objects.create(user=self.user1, room=self.room1)
         with self.assertRaises(IntegrityError):
             RoomBookingQ.objects.create(user=self.user1, room=self.room1)
+
+    def test_roombooking_q_child_same_conflict(self):
+        RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
+        with self.assertRaises(IntegrityError):
+            RoomBookingQChild.objects.create(user=self.user1, room=self.room1)
 
 
 class PartialIndexJobTest(TestCase):
